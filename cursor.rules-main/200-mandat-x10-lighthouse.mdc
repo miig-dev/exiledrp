@@ -1,0 +1,42 @@
+---
+description: Mandat X10 et Prompt Optimisé V2 pour l'exécution du Forfait Lighthouse 90+
+globs: 
+---
+
+# Mandat X10 : Performance & Auditabilité
+
+Ce document contient le prompt maître et les standards à appliquer pour toute tâche nécessitant une performance critique (Lighthouse 90+).
+
+## 🎯 Objectif
+Générer des structures de composants hautement performants en maximisant les Server Components et en minimisant l'hydratation client.
+
+## 🤖 Prompt Maître (À utiliser pour déléguer)
+
+Copiez ce prompt pour lancer une tâche d'implémentation :
+
+> **Mandat d'Implémentateur Next.js 15 Full-Stack :** Vous êtes le développeur sous mon audit strict. Vous devez générer **90% du code** en adhérant **sans compromis** aux standards X10 suivants pour la performance et l'auditabilité :
+>
+> **Stack X10 & Architecture :** Next.js 15 (App Router), TypeScript **strict**, Prisma, Shadcn UI, Radix UI, et Tailwind (Mobile-First).
+> **Principes de Rendu (Audit-First) :** Maximiser **RSC** et **Server Actions**. Minimiser `'use client'` à la stricte nécessité et l'encapsuler. Utiliser **Suspense** pour le streaming. Optimiser pour **LCP/CLS/FID**.
+> **Convention :** Répertoires en `lowercase-with-dashes`. Composants en `export const MyComponent = (props: Props) => {}`. Utiliser `type` sur `interface`.
+> **Data / State :** Utiliser **Prisma SDK** pour la base de données (PostgresQL). Utiliser **'nuqs'** pour la gestion de l'état des paramètres URL.
+>
+> **Tâche à Exécuter (Forfait Lighthouse) :**
+>
+> Générer la structure complète du répertoire `app/(main)/listings/` (ou autre feature) pour une page affichant une liste de données paginée et filtrée. Cette structure doit inclure :
+>
+> 1.  Le fichier **`page.tsx`** (en **Server Component**) qui récupère les données et les paramètres de filtrage/pagination via `searchParams`. Il doit inclure `generateMetadata` pour un SEO dynamique basé sur les filtres.
+> 2.  Le composant **`ProductListingsContainer`** (en **Server Component**) qui prend les données et les passe à un sous-composant. **Il doit être enveloppé dans une `<Suspense>` avec un `Skeleton` adapté pour ne pas bloquer l'affichage initial des filtres (TTFB).**
+> 3.  Le composant **`ClientFilterControls.tsx`** (marqué `'use client'`) qui gère les entrées utilisateur. Il doit utiliser **'nuqs'** pour l'URL et **`useTransition`** (ou l'état de loading de nuqs) pour fournir un feedback visuel immédiat (ex: opacité) lors du filtrage (UX/INP).
+> 4.  Le composant **`ProductCard`** (en **Server Component** ou minimal client). **Il doit accepter une prop `priority: boolean` pour forcer le chargement immédiat (`eager`) des images au-dessus de la ligne de flottaison (optimisation LCP).**
+> 5.  Un schéma Prisma optimisé incluant les **index (`@@index`)** sur les colonnes filtrables pour garantir des requêtes rapides.
+>
+> **Objectif Final : Minimiser l'Hydratation, maximiser la performance côté serveur et la sécurité des types.**
+
+## 📋 Checklist de Validation X10
+
+1. **Architecture Server-First :** `page.tsx` (Server) -> `ClientControls` (Client) -> `ListContainer` (Server).
+2. **État URL :** Utilisation exclusive de `nuqs` pour les filtres/pagination. Pas de `useState` complexe pour les données.
+3. **Feedback UX :** Indicateur visuel (pending state) lors des transitions de filtres.
+4. **LCP Optimisé :** Images prioritaires (`priority={true}`) pour les éléments visibles au chargement.
+5. **Base de Données :** Index présents sur les champs de recherche/filtre.

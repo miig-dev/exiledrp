@@ -1,0 +1,66 @@
+// Schéma Prisma pour ExiledRP
+// Utilisateur Discord, Staff, Rôles, Fiches, Messages, Logs
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(uuid())
+  discordId String    @unique
+  username  String
+  email     String?
+  avatar    String?
+  roles     Role[]
+  staff     Staff?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+  logs      Log[]
+}
+
+model Role {
+  id        String  @id @default(uuid())
+  name      String
+  discordId String?
+  users     User[]
+  staffs    Staff[]
+}
+
+model Staff {
+  id       String   @id @default(uuid())
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String   @unique
+  fiche    Fiche?
+  role     Role?    @relation(fields: [roleId], references: [id])
+  joinedAt DateTime @default(now())
+  roleId   String?
+}
+
+model Fiche {
+  id      String  @id @default(uuid())
+  staff   Staff   @relation(fields: [staffId], references: [id])
+  staffId String  @unique
+  bio     String?
+  notes   String?
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  action    String
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  createdAt DateTime @default(now())
+}

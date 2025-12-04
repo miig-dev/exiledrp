@@ -39,3 +39,40 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Bun
+.bun/
+.bun.lockb
+
+# VS Code
+.vscode/
+.vscode-userdata/
+*.code-workspace
+
+# OS
+Thumbs.db
+
+# Prisma
+prisma/migrations/
+
+# Cache
+.cache/
+
+# System
+*.pid
+
+# Trash
+*.tmp
+
+# Others
+*.swp
+*.swo
+
+# Ignore pnpm lock if not needed
+pnpm-lock.yaml
+
+# Ignore user config
+/home/igor_migdev/.var/app/com.visualstudio.code/config/Code/User/
+
+# Cursor rules
+cursor.rules-main/
