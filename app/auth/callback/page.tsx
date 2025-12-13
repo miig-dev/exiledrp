@@ -4,7 +4,7 @@ import { useSession } from "@/lib/auth-client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-export default function AuthCallbackPage() {
+export const AuthCallbackPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, isPending } = useSession();
@@ -32,4 +32,6 @@ export default function AuthCallbackPage() {
       </div>
     </div>
   );
-}
+};
+
+export default AuthCallbackPage;

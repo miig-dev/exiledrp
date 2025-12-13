@@ -12,7 +12,11 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
-export default function IOSLayout({ children }: { children: React.ReactNode }) {
+type IOSLayoutProps = {
+  children: React.ReactNode;
+};
+
+export const IOSLayout = ({ children }: IOSLayoutProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const isDashboard = pathname === "/ios";
@@ -63,4 +67,6 @@ export default function IOSLayout({ children }: { children: React.ReactNode }) {
       <Taskbar />
     </div>
   );
-}
+};
+
+export default IOSLayout;
