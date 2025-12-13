@@ -11,50 +11,79 @@
 
 # Todo List stratégique Exiled RP (Stack Bun / Next.js / tRPC / Prisma / Auth.js)
 
+## 1. Fondations & Infrastructure
+
 - [x] Initialiser le projet avec Bun, Next.js, TypeScript
-  - [x] Mettre en place le package manager Bun, scripts de dev et de build
-  - [x] Créer la structure App Router Next.js (pages publiques et internes)
-- [x] Mettre en place Tailwind CSS et Shadcn/ui
-  - [x] Intégrer le style Cyber Ciel Bleu, Glassmorphism, composants UI réutilisables
-- [x] Configurer tRPC pour l’API typesafe
-  - [x] Créer la couche API interne, tous les modules passent par tRPC
+- [x] Mettre en place Tailwind CSS et Shadcn/ui (Style Cyber Ciel Bleu)
+- [x] Configurer tRPC pour l’API typesafe (Router racine, Context, Provider)
 - [x] Écrire le schéma Prisma complet
-  - [x] Modéliser Animation, Job, JobMember, JobReport, JobStat, EmergencyCall, StaffNote, StaffSanction, Message
-  - [x] Modéliser User (avec rôle), Staff, Fiche, Role, Log, Message
-- [x] Générer et appliquer les migrations Prisma
-- [ ] Intégrer Auth.js (NextAuth.js) avec Adapter Prisma
-  - [ ] Gestion des sessions, rôles, middleware de protection des routes
-- [ ] Protéger l’espace interne “Exiled IOS”
-  - [ ] Middleware Next.js + Auth.js, redirection automatique selon rôle
-- [ ] Développer les modules applicatifs internes
-  - [ ] Messagerie interne (Mail, pièces jointes, logs Discord)
-  - [ ] Animation Center (CRUD, stats, logs Discord)
-  - [ ] Profession Center (gestion métiers, rapports, stats)
-  - [ ] Emergency Live (appels, assignation, stats)
-  - [ ] Staff Center (fiche staff, notes, sanctions)
-- [ ] Implémenter les logs Discord via Cloud Functions (TypeScript)
-  - [ ] Déclencher les logs sur toutes les actions sensibles
-- [ ] Intégrer Firebase Storage pour les fichiers et assets
-- [ ] Générer la documentation complète (README, .env, scripts Bun, déploiement)
-- [ ] Fournir l’arborescence complète et tous les fichiers clés (TSX, TS, Prisma, JSON)
+  - [x] Core: User, Role, Staff
+  - [x] Métiers: Job, JobGrade, JobMember
+  - [x] Urgences: EmergencyCall
+  - [x] Staff: StaffNote, StaffSanction
+  - [x] Système: Log, Message
+- [x] Générer le client Prisma
+- [x] Intégrer Auth.js (NextAuth.js) avec Adapter Prisma
+- [x] Sécuriser les routes via Middleware (Protection /ios, /dashboard)
 
-## Modules tRPC à créer
+## 2. Logique Métier (Backend tRPC)
 
-- [ ] AnimationRouter : gestion des animations (CRUD, stats)
-- [ ] JobRouter : gestion des métiers, membres, rapports, stats
-- [ ] EmergencyRouter : gestion des appels d’urgence, assignations
-- [ ] StaffRouter : fiche staff, notes, sanctions
-- [ ] MessageRouter : messagerie interne, pièces jointes
-- [ ] LogRouter : logs Discord, actions sensibles
+- [x] **JobRouter V1** : CRUD Métiers, Grades, Recrutement, "MyJobs"
+- [x] **EmergencyRouter V1** : Création appels, Liste active, Prise en charge, Clôture
+- [x] **StaffRouter (Type Pronote)** :
+  - [x] Fiche staff complète, suivi comportement
+  - [x] Notes internes et Sanctions
+  - [ ] Stats de performance (à enrichir)
+- [x] **AnimationRouter Avancé** :
+  - [x] CRUD Animations avec status (planif/cours/terminé)
+  - [x] Gestion participants et staff assigné
+  - [ ] Stats (moyenne hebdo, staff le plus actif) (à enrichir)
+- [x] **MessageRouter (Interne)** :
+  - [x] Envoi, Réception, Archivage, Suppression
+  - [ ] Système de pièces jointes (lien vers storage) (à implémenter)
+- [x] **JobRouter V2 (Avancé)** :
+  - [x] Rapports d'intervention
+  - [x] Prise de service (Dispo/Indispo/Mission)
+  - [x] Stats métiers (Taux présence, courbes)
 
-Chaque module tRPC doit être typé, sécurisé (middleware Auth.js) et exposer les opérations métier nécessaires.
+## 3. Interface Utilisateur (Frontend)
+
+- [x] Site Public (Accueil, Règlement, etc.) - _Structure faite, contenu à enrichir_
+- [x] **Espace "Exiled IOS" (Windows 11 Style)**
+  - [x] Bureau avec icônes dynamiques
+  - [x] Barre des tâches stylée
+  - [x] Système de fenêtres (Glassmorphism)
+- [x] **Applications Internes (Connectées tRPC)**
+  - [x] App "Profession Center" (Pôle Métiers)
+  - [x] App "Urgence Live" (Tableau de bord temps réel)
+  - [x] App "Animation Center"
+  - [x] App "Staff Center" (Pour Gestion/Direction)
+  - [x] App "Messagerie" (Outlook style)
+
+## 4. Services Transverses
+
+- [x] **Système de Logs Discord Centralisé**
+  - [x] Webhook manager global (`src/lib/discord-logger.ts`)
+  - [x] Triggers automatiques sur chaque action sensible (intégré dans StaffRouter)
+- [x] **Pôle Direction & Gestion**
+  - [x] Dashboard global (Vue d'ensemble) - _Dashboard Direction avec stats complètes_
+  - [x] Outils d'admin (Maintenance, User management) - _Dashboard Gestion avec CRUD staff_
+
+## 5. Déploiement & Doc
+
+- [x] Générer la documentation complète (README final) - _README.md mis à jour avec config_
+- [ ] Scripts de déploiement
 
 # Points manquants / à prioriser
 
-- tRPC : API interne et modules métiers
-- Prisma : enrichir le schéma, générer les migrations
-- Auth.js : gestion des rôles, protection des routes
-- Modules internes : messagerie, animation, staff, emergency
-- Logs Discord : via Cloud Functions
-- Stockage fichiers : Firebase Storage
-- Documentation et scripts de déploiement
+1.  ~~Frontend IOS (Le gros morceau UI)~~ ✅ **TERMINÉ**
+2.  ~~Complétion des routeurs tRPC (Logique métier fine)~~ ✅ **TERMINÉ** (à enrichir avec stats avancées)
+3.  ~~Logs Discord (Indispensable pour la tracabilité)~~ ✅ **TERMINÉ**
+
+# Prochaines étapes
+
+1. ~~**Enrichir les stats** : Ajouter statistiques avancées dans AnimationRouter et StaffRouter~~ ✅ **TERMINÉ**
+2. ~~**Pièces jointes** : Implémenter le système de pièces jointes pour la messagerie~~ ✅ **TERMINÉ**
+3. ~~**Dashboard Direction/Gestion** : Compléter les pages `/ios/direction` et `/ios/gestion`~~ ✅ **TERMINÉ**
+4. **Scripts de déploiement** : Créer les scripts pour déploiement production
+5. **Tests & Optimisations** : Tests E2E, optimisations performances

@@ -3,8 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import TRPCDemo from "../components/TRPCDemo";
-import TRPCRoutersDemo from "../components/TRPCRoutersDemo";
 
 export default function Home() {
   // Menu responsive state
@@ -21,11 +19,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#181A1B] text-white flex flex-col">
-      {/* Démo tRPC */}
-      <div className="p-4">
-        <TRPCDemo />
-        <TRPCRoutersDemo />
-      </div>
       {/* Header */}
       <header className="w-full border-b border-[#23272A] py-4 px-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 relative">
         <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
@@ -201,10 +194,6 @@ export default function Home() {
               </p>
             </div>
           </section>
-          {/* Footer */}
-          <footer className="w-full border-t border-[#23272A] py-4 px-6 text-center text-gray-400 text-sm">
-            © 2025 Exiled RP [WL] — Tous droits réservés
-          </footer>
         </div>
       </main>
     </div>

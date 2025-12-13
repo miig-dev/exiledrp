@@ -1,10 +1,22 @@
-import { NextRequest } from "next/server";
-import { handler } from "../../../../server/handler";
+import { appRouter } from "@/server/root";
+import { createTRPCContext } from "@/server/trpc";
+import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { type NextRequest } from "next/server";
 
-export async function GET(req: NextRequest) {
-  return handler(req);
-}
+const handler = (req: NextRequest) =>
+  fetchRequestHandler({
+    endpoint: "/api/trpc",
+    req,
+    router: appRouter,
+    createContext: () => createTRPCContext({ headers: req.headers }),
+    onError:
+      process.env.NODE_ENV === "development"
+        ? ({ path, error }) => {
+            console.error(
+              `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
+            );
+          }
+        : undefined,
+  });
 
-export async function POST(req: NextRequest) {
-  return handler(req);
-}
+export { handler as GET, handler as POST };
