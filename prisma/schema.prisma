@@ -1,0 +1,343 @@
+// Schéma Prisma pour ExiledRP
+// Utilisateur Discord, Staff, Rôles, Fiches, Messages, Logs
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- CORE USER & AUTH (Better Auth) ---
+
+model User {
+  id            String   @id @default(uuid())
+  name          String?
+  email         String?  @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Champs personnalisés pour ExiledRP
+  discordId String? @unique
+  username  String?
+  avatar    String?
+
+  // Relations Better Auth
+  accounts Account[]
+  sessions Session[]
+
+  // Relations ExiledRP
+  roles          Role[]
+  staff          Staff?
+  messages       Message[]
+  logs           Log[]
+  jobMembers     JobMember[]
+  emergencyCalls EmergencyCall[] @relation("Caller")
+  takenCalls     EmergencyCall[] @relation("Taker")
+
+  // Relations Animations
+  animationsCreated Animation[]            @relation("Organizer")
+  animationsJoined  AnimationParticipant[]
+
+  // Relations Messagerie Interne
+  sentMails     Mail[] @relation("Sender")
+  receivedMails Mail[] @relation("Receiver")
+
+  // Relations Job Reports
+  jobReports JobReport[]
+}
+
+// Modèle Better Auth pour les comptes OAuth
+model Account {
+  id                    String    @id @default(uuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String? // Pour email/password (non utilisé ici)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+// Modèle Better Auth pour les sessions
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+// Modèle Better Auth pour les vérifications (email, etc.)
+model Verification {
+  id         String   @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+}
+
+model Role {
+  id        String  @id @default(uuid())
+  name      String  @unique // Ex: "Admin", "Moderator", "Whitelisted"
+  discordId String? // ID du rôle Discord correspondant
+  users     User[]
+  staffs    Staff[] // Un staff peut avoir un rôle spécifique dans l'équipe
+}
+
+// --- MODULE STAFF ---
+
+model Staff {
+  id       String   @id @default(uuid())
+  userId   String   @unique
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId   String?
+  role     Role?    @relation(fields: [roleId], references: [id])
+  joinedAt DateTime @default(now())
+
+  // Relations Staff Center
+  fiche     Fiche?
+  notes     StaffNote[]
+  sanctions StaffSanction[]
+  absences  StaffAbsence[]
+
+  @@index([userId])
+}
+
+model Fiche {
+  id      String  @id @default(uuid())
+  staffId String  @unique
+  staff   Staff   @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  bio     String?
+  notes   String? // Notes générales
+}
+
+model StaffNote {
+  id        String   @id @default(uuid())
+  staffId   String
+  staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  content   String
+  authorId  String // ID de l'admin qui a mis la note
+  createdAt DateTime @default(now())
+
+  @@index([staffId])
+}
+
+model StaffSanction {
+  id        String   @id @default(uuid())
+  staffId   String
+  staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  type      String // Ex: "Warn", "Blame", "Ban"
+  reason    String
+  authorId  String // ID de l'admin qui a sanctionné
+  createdAt DateTime @default(now())
+
+  @@index([staffId])
+}
+
+model StaffAbsence {
+  id        String   @id @default(uuid())
+  staffId   String
+  staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  type      String   @default("ABSENCE") // "ABSENCE" ou "DELAY"
+  date      DateTime // Date de l'absence/retard
+  reason    String? // Raison optionnelle
+  duration  Int? // Durée en minutes (pour les retards)
+  authorId  String // ID de l'admin qui a enregistré
+  createdAt DateTime @default(now())
+
+  @@index([staffId])
+  @@index([date])
+}
+
+// --- MODULE JOBS (Métiers) ---
+
+model Job {
+  id        String   @id @default(uuid())
+  name      String   @unique // Ex: "LSPD", "EMS", "Benny's"
+  label     String // Affichage propre: "Los Santos Police Dept"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  grades  JobGrade[]
+  members JobMember[]
+  reports JobReport[]
+}
+
+model JobGrade {
+  id     String @id @default(uuid())
+  jobId  String
+  job    Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  name   String // Ex: "Cadet", "Officier"
+  level  Int // Niveau hiérarchique (0, 1, 2...)
+  salary Int    @default(0)
+
+  // Relations
+  members JobMember[]
+
+  @@unique([jobId, level]) // Pas deux grades de même niveau dans un job
+  @@index([jobId])
+}
+
+model JobMember {
+  id       String   @id @default(uuid())
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId    String
+  job      Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  gradeId  String
+  grade    JobGrade @relation(fields: [gradeId], references: [id])
+  joinedAt DateTime @default(now())
+
+  // Gestion de service (Prise de service)
+  isAvailable      Boolean   @default(false) // En service ou non
+  serviceStatus    String    @default("OFF_DUTY") // OFF_DUTY, AVAILABLE, BUSY, IN_INTERVENTION
+  lastServiceStart DateTime?
+  totalServiceTime Int       @default(0) // En minutes
+
+  @@unique([userId, jobId])
+  @@index([userId])
+  @@index([jobId])
+}
+
+model JobReport {
+  id        String   @id @default(uuid())
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  title     String
+  content   String   @db.Text
+  status    String   @default("OPEN") // OPEN, CLOSED, ARCHIVED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([jobId])
+  @@index([authorId])
+}
+
+// --- MODULE EMERGENCY (Appels d'urgence) ---
+
+model EmergencyCall {
+  id        String   @id @default(uuid())
+  type      String // "POLICE", "EMS", "MECANO"
+  message   String
+  coords    String? // Coordonnées GPS "x,y,z"
+  status    String   @default("PENDING") // PENDING, TAKEN, DONE
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  priority  Int      @default(1) // 1 = Normal, 2 = Urgent, 3 = Vital
+
+  callerId String
+  caller   User   @relation("Caller", fields: [callerId], references: [id])
+
+  takenById String?
+  takenBy   User?     @relation("Taker", fields: [takenById], references: [id])
+  takenAt   DateTime?
+
+  @@index([status])
+  @@index([type])
+}
+
+// --- MODULE ANIMATION ---
+
+model Animation {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  date        DateTime // Date prévue de l'event
+  location    String?
+  status      String   @default("PLANNING") // PLANNING, ONGOING, FINISHED
+
+  organizerId String?
+  organizer   User?   @relation("Organizer", fields: [organizerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participants AnimationParticipant[]
+}
+
+model AnimationParticipant {
+  id            String    @id @default(uuid())
+  animationId   String
+  animation     Animation @relation(fields: [animationId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt      DateTime  @default(now())
+  accreditation String? // Type d'accréditation : "ORGANIZER", "MODERATOR", "PARTICIPANT", "OBSERVER", etc.
+
+  @@unique([animationId, userId])
+}
+
+// --- MODULE MESSAGERIE INTERNE (Mail) ---
+
+model Mail {
+  id         String  @id @default(uuid())
+  subject    String
+  content    String  @db.Text
+  isRead     Boolean @default(false)
+  isArchived Boolean @default(false)
+  isDeleted  Boolean @default(false)
+  attachment String? // URL vers le fichier (Firebase Storage)
+
+  senderId String
+  sender   User   @relation("Sender", fields: [senderId], references: [id])
+
+  receiverId String
+  receiver   User   @relation("Receiver", fields: [receiverId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+// --- SYSTÈME ---
+
+model Message {
+  id        String   @id @default(uuid())
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  content   String
+  channelId String? // Pour filtrer par "salon" ou contexte
+  createdAt DateTime @default(now())
+
+  @@index([authorId])
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  action    String // Ex: "STAFF_WARN", "JOB_HIRE"
+  details   String? // JSON stringifié ou texte
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([action])
+}
