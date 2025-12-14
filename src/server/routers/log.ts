@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { directionProcedure, protectedProcedure, router } from "../trpc";
+import { gestionProcedure, protectedProcedure, router } from "../trpc";
 
 export const logRouter = router({
-  getAll: protectedProcedure.query(async ({ ctx }) => {
+  getAll: protectedProcedure.query(async () => {
     // TODO: Ajouter vérification des droits si besoin
     return await prisma.log.findMany({
       orderBy: { createdAt: "desc" },
@@ -17,7 +17,7 @@ export const logRouter = router({
         userId: z.string(),
       })
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       // TODO: Ajouter vérification des droits si besoin
       return await prisma.log.create({
         data: {
@@ -28,9 +28,9 @@ export const logRouter = router({
     }),
 
   /**
-   * EXPORT: Exporter toutes les données (Direction seulement)
+   * EXPORT: Exporter toutes les données (Gestion/Direction)
    */
-  exportAllData: directionProcedure.query(async () => {
+  exportAllData: gestionProcedure.query(async () => {
     const [users, staff, animations, jobs, emergencyCalls, mails, logs] =
       await Promise.all([
         prisma.user.findMany({
@@ -87,5 +87,5 @@ export const logRouter = router({
       mails,
       logs,
     };
-    }),
+  }),
 });

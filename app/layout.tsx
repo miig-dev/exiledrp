@@ -21,11 +21,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<Record<string, never>>;
 }>) {
+  // Déballer params même si non utilisé pour éviter l'erreur de sérialisation
+  await params;
   return (
     <html
       lang="fr"

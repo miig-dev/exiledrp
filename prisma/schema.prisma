@@ -48,6 +48,10 @@ model User {
 
   // Relations Job Reports
   jobReports JobReport[]
+
+  // Relations Staff
+  staffNotesWritten     StaffNote[]
+  staffSanctionsWritten StaffSanction[]
 }
 
 // Modèle Better Auth pour les comptes OAuth
@@ -142,9 +146,11 @@ model StaffNote {
   staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
   content   String
   authorId  String // ID de l'admin qui a mis la note
+  author    User     @relation(fields: [authorId], references: [id])
   createdAt DateTime @default(now())
 
   @@index([staffId])
+  @@index([authorId])
 }
 
 model StaffSanction {
@@ -155,6 +161,8 @@ model StaffSanction {
   reason    String
   authorId  String // ID de l'admin qui a sanctionné
   createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
 
   @@index([staffId])
 }

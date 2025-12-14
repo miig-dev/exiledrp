@@ -39,7 +39,7 @@ export default function GestionPage() {
 
   const filteredStaff = staffList?.filter(
     (staff) =>
-      staff.user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      staff.user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       staff.role?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -90,16 +90,7 @@ export default function GestionPage() {
           )}
 
           <div className="mt-auto pt-4 border-t border-white/10">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                // TODO: Export des données
-                alert("Export en cours de développement");
-              }}
-            >
-              <Download className="w-4 h-4 mr-2" /> Exporter données
-            </Button>
+            <ExportDataButton />
           </div>
         </div>
 
@@ -132,12 +123,12 @@ export default function GestionPage() {
                   <Avatar>
                     <AvatarImage src={staff.user.avatar || ""} />
                     <AvatarFallback>
-                      {staff.user.username.charAt(0).toUpperCase()}
+                      {staff.user.username?.charAt(0).toUpperCase() || "?"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-white font-medium truncate">
-                      {staff.user.username}
+                      {staff.user.username || "Inconnu"}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
                       {staff.role && (
@@ -236,12 +227,14 @@ function StaffDetails({ staffId }: { staffId: string }) {
 
   if (!details) return <p className="text-gray-400">Chargement...</p>;
 
+  type StaffDetailsType = RouterOutputs["staff"]["getDetails"];
+
   return (
     <div className="space-y-4">
       <div>
         <p className="text-sm text-gray-400">Rôle</p>
         <p className="text-white font-medium">
-          {details.role?.name || "Aucun rôle"}
+          {(details as StaffDetailsType).role?.name || "Aucun rôle"}
         </p>
       </div>
       {stats && (
@@ -394,5 +387,45 @@ function AddStaffForm({
         </form>
       </div>
     </div>
+  );
+}
+
+function ExportDataButton() {
+  const { isLoading, refetch } = trpc.log.exportAllData.useQuery(
+    undefined,
+    { enabled: false } // Ne pas charger automatiquement
+  );
+
+  const handleExport = async () => {
+    try {
+      const result = await refetch();
+      if (result.data) {
+        const dataStr = JSON.stringify(result.data, null, 2);
+        const dataBlob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `exiledrp-export-${
+          new Date().toISOString().split("T")[0]
+        }.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error("Erreur export:", error);
+      alert("Erreur lors de l'export des données");
+    }
+  };
+
+  return (
+    <Button
+      variant="outline"
+      className="w-full"
+      onClick={handleExport}
+      disabled={isLoading}
+    >
+      <Download className="w-4 h-4 mr-2" />
+      {isLoading ? "Export..." : "Exporter données"}
+    </Button>
   );
 }

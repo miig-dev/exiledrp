@@ -11,12 +11,17 @@ import {
   Users,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { use } from "react";
 
 type IOSLayoutProps = {
   children: React.ReactNode;
+  params?: Promise<Record<string, never>>;
 };
 
-export const IOSLayout = ({ children }: IOSLayoutProps) => {
+export const IOSLayout = ({ children, params }: IOSLayoutProps) => {
+  // Déballer params immédiatement avec React.use() pour éviter l'erreur de sérialisation
+  // Ne jamais garder params en tant que Promise dans les props
+  const unwrappedParams = params ? use(params) : undefined;
   const router = useRouter();
   const pathname = usePathname();
   const isDashboard = pathname === "/ios";

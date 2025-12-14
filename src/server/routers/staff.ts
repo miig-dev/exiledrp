@@ -36,6 +36,11 @@ export const staffRouter = router({
           fiche: true,
           notes: {
             orderBy: { createdAt: "desc" },
+            include: {
+              author: {
+                select: { username: true },
+              },
+            },
           },
           sanctions: {
             orderBy: { createdAt: "desc" },
@@ -358,7 +363,8 @@ export const staffRouter = router({
       if (!targetUser) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Utilisateur introuvable (vérifiez le Discord ID ou User ID)",
+          message:
+            "Utilisateur introuvable (vérifiez le Discord ID ou User ID)",
         });
       }
 

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { RouterOutputs } from "@/lib/trpcClient";
 import { trpc } from "@/lib/trpcClient";
-import { format } from "date-fns";
+import { differenceInMonths, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
   AlertTriangle,
@@ -32,7 +32,7 @@ export default function StaffCenter() {
   const [search, setSearch] = useState("");
 
   const filteredStaff = staffList?.filter((s) =>
-    s.user.username.toLowerCase().includes(search.toLowerCase())
+    s.user.username?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -70,11 +70,13 @@ export default function StaffCenter() {
               >
                 <Avatar className="h-10 w-10 border border-white/10">
                   <AvatarImage src={staff.user.avatar || ""} />
-                  <AvatarFallback>{staff.user.username[0]}</AvatarFallback>
+                  <AvatarFallback>
+                    {staff.user.username?.charAt(0).toUpperCase() || "?"}
+                  </AvatarFallback>
                 </Avatar>
                 <div>
                   <div className="font-medium text-white">
-                    {staff.user.username}
+                    {staff.user.username || "Inconnu"}
                   </div>
                   <div className="text-xs text-gray-300 flex items-center gap-1">
                     <Shield className="w-3 h-3" />
@@ -140,7 +142,7 @@ function StaffDetails({ staffId }: { staffId: string }) {
           <Avatar className="h-20 w-20 border-2 border-blue-500">
             <AvatarImage src={staff.user.avatar || ""} />
             <AvatarFallback className="text-2xl">
-              {staff.user.username[0]}
+              {staff.user.username?.charAt(0).toUpperCase() || "?"}
             </AvatarFallback>
           </Avatar>
           <div>
@@ -163,7 +165,10 @@ function StaffDetails({ staffId }: { staffId: string }) {
             Rejoint le{" "}
             {format(new Date(staff.joinedAt), "dd/MM/yyyy", { locale: fr })}
           </div>
-          <div>Ancienneté: 2 mois</div> {/* TODO: Calcul réel */}
+          <div>
+            Ancienneté:{" "}
+            {differenceInMonths(new Date(), new Date(staff.joinedAt))} mois
+          </div>
         </div>
       </div>
 
@@ -206,7 +211,7 @@ function StaffDetails({ staffId }: { staffId: string }) {
                 className="bg-white/5 p-3 rounded text-sm border-l-2 border-blue-500"
               >
                 <div className="flex justify-between text-xs text-gray-400 mb-1">
-                  <span>Par Admin</span> {/* TODO: Nom auteur */}
+                  <span>Par {note.author?.username || "Inconnu"}</span>
                   <span>
                     {format(new Date(note.createdAt), "dd/MM/yyyy", {
                       locale: fr,
