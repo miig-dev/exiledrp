@@ -6,9 +6,9 @@ import type { LucideIcon } from "lucide-react";
 import { Grid, LogOut, Menu, User } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export const Taskbar = () => {
+export function Taskbar() {
   const [time, setTime] = useState(new Date());
-  const [startOpen, setStartOpen] = useState(false);
+  const [isStartOpen, setIsStartOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -20,10 +20,10 @@ export const Taskbar = () => {
       {/* Start Button & Pinned Apps */}
       <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
         <button
-          onClick={() => setStartOpen(!startOpen)}
+          onClick={() => setIsStartOpen(!isStartOpen)}
           className={cn(
             "p-2 rounded hover:bg-white/10 transition-colors",
-            startOpen && "bg-white/10"
+            isStartOpen && "bg-white/10"
           )}
         >
           <Menu className="w-6 h-6 text-blue-400" />
@@ -40,7 +40,7 @@ export const Taskbar = () => {
       </div>
 
       {/* Start Menu (Popup) */}
-      {startOpen && (
+      {isStartOpen && (
         <div className="absolute bottom-14 left-1/2 -translate-x-1/2 w-[600px] h-[500px] bg-[#1c1c1c]/95 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl p-6 flex flex-col animate-in slide-in-from-bottom-5">
           <div className="mb-4">
             <div className="relative">
@@ -76,21 +76,22 @@ export const Taskbar = () => {
       )}
     </div>
   );
-};
+}
 
-const AppShortcut = ({
-  icon: Icon,
-  label,
-}: {
+type AppShortcutProps = {
   icon: LucideIcon;
   label: string;
-}) => (
-  <button className="flex flex-col items-center gap-2 p-2 rounded hover:bg-white/5 transition-colors group">
-    <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
-      <Icon className="w-5 h-5 text-blue-400" />
-    </div>
-    <span className="text-xs text-center text-gray-300 group-hover:text-white">
-      {label}
-    </span>
-  </button>
-);
+};
+
+function AppShortcut({ icon: Icon, label }: AppShortcutProps) {
+  return (
+    <button className="flex flex-col items-center gap-2 p-2 rounded hover:bg-white/5 transition-colors group">
+      <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+        <Icon className="w-5 h-5 text-blue-400" />
+      </div>
+      <span className="text-xs text-center text-gray-300 group-hover:text-white">
+        {label}
+      </span>
+    </button>
+  );
+}

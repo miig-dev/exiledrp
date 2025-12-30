@@ -5,19 +5,19 @@ import { LucideIcon, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
-interface WindowProps {
+type WindowProps = {
   title: string;
   icon?: LucideIcon;
   children: ReactNode;
   className?: string;
-}
+};
 
-export const Window = ({
+export function Window({
   title,
   icon: Icon,
   children,
   className,
-}: WindowProps) => {
+}: WindowProps) {
   const router = useRouter();
 
   return (
@@ -48,4 +48,4 @@ export const Window = ({
       </div>
     </div>
   );
-};
+}

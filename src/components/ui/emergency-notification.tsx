@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { AlertCircle, Phone, ShieldAlert, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-type EmergencyCall = {
+type EmergencyCallType = {
   id: string;
   type: "POLICE" | "EMS" | "MECANO";
   message: string;
@@ -15,25 +15,21 @@ type EmergencyCall = {
 };
 
 type EmergencyNotificationProps = {
-  call: EmergencyCall;
+  call: EmergencyCallType;
   onTakeCall: (callId: string) => void;
   onDismiss: () => void;
 };
 
-export const EmergencyNotification = ({
+export function EmergencyNotification({
   call,
   onTakeCall,
   onDismiss,
-}: EmergencyNotificationProps) => {
+}: EmergencyNotificationProps) {
   const [isVisible, setIsVisible] = useState(true);
-  const [soundPlayed, setSoundPlayed] = useState(false);
 
   useEffect(() => {
     // Jouer un son d'alerte (optionnel, nécessite un fichier audio)
-    if (!soundPlayed) {
-      // On pourrait ajouter un son ici si nécessaire
-      setSoundPlayed(true);
-    }
+    // On pourrait ajouter un son ici si nécessaire
 
     // Auto-dismiss après 30 secondes
     const timer = setTimeout(() => {
@@ -42,7 +38,7 @@ export const EmergencyNotification = ({
     }, 30000);
 
     return () => clearTimeout(timer);
-  }, [soundPlayed, onDismiss]);
+  }, [onDismiss]);
 
   if (!isVisible) return null;
 
@@ -107,4 +103,4 @@ export const EmergencyNotification = ({
       </Card>
     </div>
   );
-};
+}

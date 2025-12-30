@@ -2,8 +2,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
-export const Sidebar = () => {
-  const [open, setOpen] = useState(false);
+export function Sidebar() {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <>
       {/* Sidebar desktop */}
@@ -39,7 +39,7 @@ export const Sidebar = () => {
       {/* Sidebar mobile : bouton menu + drawer */}
       <button
         className="md:hidden fixed top-4 left-4 z-50 bg-[#19BFFF] text-white rounded-full p-2 shadow-lg"
-        onClick={() => setOpen(true)}
+        onClick={() => setIsOpen(true)}
         aria-label="Ouvrir le menu"
       >
         <svg
@@ -56,10 +56,10 @@ export const Sidebar = () => {
           <line x1="3" y1="18" x2="21" y2="18" />
         </svg>
       </button>
-      {open && (
+      {isOpen && (
         <div
           className="fixed inset-0 z-50 bg-black/40"
-          onClick={() => setOpen(false)}
+          onClick={() => setIsOpen(false)}
         >
           <aside
             className="fixed top-0 left-0 h-full w-64 bg-[#23272A] text-white p-6 flex flex-col gap-6 shadow-xl"
@@ -67,7 +67,7 @@ export const Sidebar = () => {
           >
             <button
               className="absolute top-4 right-4 text-[#19BFFF]"
-              onClick={() => setOpen(false)}
+              onClick={() => setIsOpen(false)}
               aria-label="Fermer le menu"
             >
               <svg
@@ -87,56 +87,56 @@ export const Sidebar = () => {
               <Link
                 href="/ios"
                 className="hover:text-[#19BFFF] font-semibold"
-                onClick={() => setOpen(false)}
+                onClick={() => setIsOpen(false)}
               >
                 Dashboard
               </Link>
               <Link
                 href="/ios/mail"
                 className="hover:text-[#19BFFF]"
-                onClick={() => setOpen(false)}
+                onClick={() => setIsOpen(false)}
               >
                 Messagerie
               </Link>
               <Link
                 href="/ios/animation-center"
                 className="hover:text-[#19BFFF]"
-                onClick={() => setOpen(false)}
+                onClick={() => setIsOpen(false)}
               >
                 Animation Center
               </Link>
               <Link
                 href="/ios/profession-center"
                 className="hover:text-[#19BFFF]"
-                onClick={() => setOpen(false)}
+                onClick={() => setIsOpen(false)}
               >
                 Pôle Métiers
               </Link>
               <Link
                 href="/ios/emergency-live"
                 className="hover:text-[#19BFFF]"
-                onClick={() => setOpen(false)}
+                onClick={() => setIsOpen(false)}
               >
                 UrgenceLive
               </Link>
               <Link
                 href="/ios/staff-center"
                 className="hover:text-[#19BFFF]"
-                onClick={() => setOpen(false)}
+                onClick={() => setIsOpen(false)}
               >
                 Staff Center
               </Link>
               <Link
                 href="/ios/gestion"
                 className="hover:text-[#19BFFF]"
-                onClick={() => setOpen(false)}
+                onClick={() => setIsOpen(false)}
               >
                 Gestion
               </Link>
               <Link
                 href="/ios/direction"
                 className="hover:text-[#19BFFF]"
-                onClick={() => setOpen(false)}
+                onClick={() => setIsOpen(false)}
               >
                 Direction
               </Link>
@@ -146,4 +146,4 @@ export const Sidebar = () => {
       )}
     </>
   );
-};
+}
