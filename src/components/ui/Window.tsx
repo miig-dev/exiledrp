@@ -1,5 +1,8 @@
-import { cn } from "@shadcn/ui";
 import * as React from "react";
+
+function cn(...classes: (string | undefined | false)[]) {
+  return classes.filter(Boolean).join(" ");
+}
 
 type WindowProps = React.HTMLAttributes<HTMLDivElement> & {
   title?: string;
