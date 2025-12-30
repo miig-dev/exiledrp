@@ -1,10 +1,10 @@
 import { cn } from "@shadcn/ui";
 import * as React from "react";
 
-export interface WindowProps extends React.HTMLAttributes<HTMLDivElement> {
+type WindowProps = React.HTMLAttributes<HTMLDivElement> & {
   title?: string;
   icon?: React.ReactNode;
-}
+};
 
 export function Window({
   title,

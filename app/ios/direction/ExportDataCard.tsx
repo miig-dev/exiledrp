@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpcClient";
 import { Download, FileText } from "lucide-react";
 
-export const ExportDataCard = () => {
+export function ExportDataCard() {
   const { isLoading, refetch } = trpc.log.exportAllData.useQuery(
     undefined,
     { enabled: false } // Ne pas charger automatiquement
@@ -54,4 +54,4 @@ export const ExportDataCard = () => {
       </p>
     </div>
   );
-};
+}

@@ -17,15 +17,18 @@ const COLORS = {
   CRITICAL: 0x992d22, // Rouge foncé
 };
 
-interface LogOptions {
+type LogOptionsType = {
   title: string;
   description?: string;
   fields?: { name: string; value: string; inline?: boolean }[];
   author?: { name: string; icon_url?: string };
   footer?: { text: string };
-}
+};
 
-export const discordLog = async (level: LogLevel, options: LogOptions) => {
+export async function discordLog(
+  level: LogLevel,
+  options: LogOptionsType
+): Promise<void> {
   if (!WEBHOOK_URL) {
     if (process.env.NODE_ENV === "production") {
       console.warn("⚠️ DISCORD_WEBHOOK_URL non défini !");
@@ -64,5 +67,5 @@ export const discordLog = async (level: LogLevel, options: LogOptions) => {
     }
   } catch (error) {
     console.error("Erreur réseau Discord Log:", error);
+  }
 }
-};

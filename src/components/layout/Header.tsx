@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import Image from "next/image";
 
-export default function Header() {
+export function Header() {
   return (
     <header className="w-full border-b border-[#23272A] py-4 px-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
       <div className="flex items-center gap-3">

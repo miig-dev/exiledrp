@@ -4,16 +4,16 @@
 
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID;
 
-interface DiscordRole {
+type DiscordRoleType = {
   id: string;
   name: string;
   color: number;
   position: number;
-}
+};
 
-interface DiscordMember {
+type DiscordMemberType = {
   roles: string[]; // IDs des rôles
-}
+};
 
 /**
  * Récupère les rôles d'un utilisateur Discord depuis le serveur
@@ -40,7 +40,7 @@ export async function fetchDiscordUserRoles(
       }
     );
 
-    let member: DiscordMember | null = null;
+    let member: DiscordMemberType | null = null;
 
     if (userMemberResponse.ok) {
       member = await userMemberResponse.json();
@@ -105,7 +105,7 @@ export async function fetchDiscordUserRoles(
       return [];
     }
 
-    const allRoles: DiscordRole[] = await rolesResponse.json();
+    const allRoles: DiscordRoleType[] = await rolesResponse.json();
 
     // Filtrer les rôles que l'utilisateur possède
     const userRoles = allRoles.filter((role) => member.roles.includes(role.id));
@@ -130,7 +130,7 @@ import { prisma } from "./prisma";
 
 export async function syncDiscordRolesWithPrisma(
   userId: string,
-  discordRoles: DiscordRole[]
+  discordRoles: DiscordRoleType[]
 ): Promise<string[]> {
   const roleNames: string[] = [];
 

@@ -1,12 +1,12 @@
 import * as React from "react";
 import { cn } from "@shadcn/ui";
 
-interface AppLayoutProps {
+type AppLayoutProps = {
   children: React.ReactNode;
   header?: React.ReactNode;
   footer?: React.ReactNode;
   className?: string;
-}
+};
 
 export function AppLayout({ children, header, footer, className }: AppLayoutProps) {
   return (

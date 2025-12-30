@@ -1,6 +1,34 @@
-import { auth } from "@/lib/auth";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+
+// Fonction helper pour obtenir la session via l'API HTTP (compatible Edge)
+async function getSessionFromCookies(request: NextRequest) {
+  const cookieHeader = request.headers.get("cookie") || "";
+
+  // Utiliser l'URL de la requête pour construire l'URL de l'API
+  const url = new URL(request.url);
+  const apiUrl = `${url.origin}/api/auth/session`;
+
+  try {
+    // Appel à l'API better-auth pour obtenir la session
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        cookie: cookieHeader,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data?.user || null;
+    }
+  } catch (error) {
+    // En cas d'erreur, on considère qu'il n'y a pas de session
+    // Cela évite de bloquer la requête si l'API n'est pas disponible
+  }
+
+  return null;
+}
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
@@ -25,16 +53,14 @@ export async function middleware(request: NextRequest) {
   // Protection des routes IOS
   if (request.nextUrl.pathname.startsWith("/ios")) {
     try {
-      const session = await auth.api.getSession({
-        headers: request.headers,
-      });
+      const user = await getSessionFromCookies(request);
 
-      if (!session?.user) {
+      if (!user) {
         return NextResponse.redirect(new URL("/auth/signin", request.url));
       }
 
       // Redirection selon rôle pour les routes IOS
-      const roles = (session.user as { roles?: string[] }).roles || [];
+      const roles = (user as { roles?: string[] }).roles || [];
       const pathname = request.nextUrl.pathname;
 
       // Route Direction - uniquement direction

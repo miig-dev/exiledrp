@@ -3,19 +3,19 @@
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 
-interface DesktopIconProps {
+type DesktopIconProps = {
   icon: LucideIcon;
   label: string;
   onClick?: () => void;
   className?: string;
-}
+};
 
-export const DesktopIcon = ({
+export function DesktopIcon({
   icon: Icon,
   label,
   onClick,
   className,
-}: DesktopIconProps) => {
+}: DesktopIconProps) {
   return (
     <button
       onClick={onClick}
@@ -36,4 +36,4 @@ export const DesktopIcon = ({
       </span>
     </button>
   );
-};
+}
